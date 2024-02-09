@@ -2199,6 +2199,25 @@ components:
         action:
           type: string
 
+    BaseRequirement:
+      discriminator:
+        propertyName: type
+        mapping:
+          assert-create: '#/components/schemas/AssertCreate'
+          assert-table-uuid: '#/components/schemas/AssertTableUUID'
+          assert-ref-snapshot-id: '#/components/schemas/AssertRefSnapshotId'
+          assert-last-assigned-field-id: '#/components/schemas/AssertLastAssignedFieldId'
+          assert-current-schema-id: '#/components/schemas/AssertCurrentSchemaId'
+          assert-last-assigned-partition-id: '#/components/schemas/AssertLastAssignedPartitionId'
+          assert-default-spec-id: '#/components/schemas/AssertDefaultSpecId'
+          assert-default-sort-order-id: '#/components/schemas/AssertDefaultSortOrderId'
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: "string"
+
     AssignUUIDUpdate:
       description: Assigning a UUID to a table/view should only be done when creating the table/view. It is not safe to re-assign the UUID if a table/view already has a UUID assigned
       allOf:
@@ -2526,27 +2545,19 @@ components:
         - $ref: '#/components/schemas/SetCurrentViewVersionUpdate'
 
     TableRequirement:
-      discriminator:
-        propertyName: type
-        mapping:
-          assert-create: '#/components/schemas/AssertCreate'
-          assert-table-uuid: '#/components/schemas/AssertTableUUID'
-          assert-ref-snapshot-id: '#/components/schemas/AssertRefSnapshotId'
-          assert-last-assigned-field-id: '#/components/schemas/AssertLastAssignedFieldId'
-          assert-current-schema-id: '#/components/schemas/AssertCurrentSchemaId'
-          assert-last-assigned-partition-id: '#/components/schemas/AssertLastAssignedPartitionId'
-          assert-default-spec-id: '#/components/schemas/AssertDefaultSpecId'
-          assert-default-sort-order-id: '#/components/schemas/AssertDefaultSortOrderId'
-      type: object
-      required:
-        - type
-      properties:
-        type:
-          type: "string"
+      anyOf:
+        - $ref: '#/components/schemas/AssertCreate'
+        - $ref: '#/components/schemas/AssertTableUUID'
+        - $ref: '#/components/schemas/AssertRefSnapshotId'
+        - $ref: '#/components/schemas/AssertLastAssignedFieldId'
+        - $ref: '#/components/schemas/AssertCurrentSchemaId'
+        - $ref: '#/components/schemas/AssertLastAssignedPartitionId'
+        - $ref: '#/components/schemas/AssertDefaultSpecId'
+        - $ref: '#/components/schemas/AssertDefaultSortOrderId'
 
     AssertCreate:
       allOf:
-        - $ref: "#/components/schemas/TableRequirement"
+        - $ref: "#/components/schemas/BaseRequirement"
       type: object
       description: The table must not already exist; used for create transactions
       required:
@@ -2558,7 +2569,7 @@ components:
 
     AssertTableUUID:
       allOf:
-        - $ref: "#/components/schemas/TableRequirement"
+        - $ref: "#/components/schemas/BaseRequirement"
       description: The table UUID must match the requirement's `uuid`
       required:
         - type
@@ -2572,7 +2583,7 @@ components:
 
     AssertRefSnapshotId:
       allOf:
-        - $ref: "#/components/schemas/TableRequirement"
+        - $ref: "#/components/schemas/BaseRequirement"
       description:
         The table branch or tag identified by the requirement's `ref` must reference the requirement's `snapshot-id`; 
         if `snapshot-id` is `null` or missing, the ref must not already exist
@@ -2592,7 +2603,7 @@ components:
 
     AssertLastAssignedFieldId:
       allOf:
-        - $ref: "#/components/schemas/TableRequirement"
+        - $ref: "#/components/schemas/BaseRequirement"
       description:
         The table's last assigned column id must match the requirement's `last-assigned-field-id`
       required:
@@ -2607,7 +2618,7 @@ components:
 
     AssertCurrentSchemaId:
       allOf:
-        - $ref: "#/components/schemas/TableRequirement"
+        - $ref: "#/components/schemas/BaseRequirement"
       description:
         The table's current schema id must match the requirement's `current-schema-id`
       required:
@@ -2622,7 +2633,7 @@ components:
 
     AssertLastAssignedPartitionId:
       allOf:
-        - $ref: "#/components/schemas/TableRequirement"
+        - $ref: "#/components/schemas/BaseRequirement"
       description:
         The table's last assigned partition id must match the requirement's `last-assigned-partition-id`
       required:
@@ -2637,7 +2648,7 @@ components:
 
     AssertDefaultSpecId:
       allOf:
-        - $ref: "#/components/schemas/TableRequirement"
+        - $ref: "#/components/schemas/BaseRequirement"
       description:
         The table's default spec id must match the requirement's `default-spec-id`
       required:
@@ -2652,7 +2663,7 @@ components:
 
     AssertDefaultSortOrderId:
       allOf:
-        - $ref: "#/components/schemas/TableRequirement"
+        - $ref: "#/components/schemas/BaseRequirement"
       description:
         The table's default sort order id must match the requirement's `default-sort-order-id`
       required:
