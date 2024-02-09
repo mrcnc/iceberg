@@ -2532,6 +2532,8 @@ components:
         - $ref: '#/components/schemas/RemovePropertiesUpdate'
         - $ref: '#/components/schemas/SetStatisticsUpdate'
         - $ref: '#/components/schemas/RemoveStatisticsUpdate'
+        - $ref: '#/components/schemas/SetPartitionStatisticsUpdate'
+        - $ref: '#/components/schemas/RemovePartitionStatisticsUpdate'
 
     ViewUpdate:
       anyOf:
