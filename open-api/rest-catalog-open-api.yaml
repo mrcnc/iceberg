@@ -2186,8 +2186,6 @@ components:
           set-location: '#/components/schemas/SetLocationUpdate'
           set-properties: '#/components/schemas/SetPropertiesUpdate'
           remove-properties: '#/components/schemas/RemovePropertiesUpdate'
-          add-view-version: '#/components/schemas/AddViewVersionUpdate'
-          set-current-view-version: '#/components/schemas/SetCurrentViewVersionUpdate'
           set-statistics: '#/components/schemas/SetStatisticsUpdate'
           remove-statistics: '#/components/schemas/RemoveStatisticsUpdate'
           set-partition-statistics: '#/components/schemas/SetPartitionStatisticsUpdate'
@@ -2220,8 +2218,6 @@ components:
 
     AssignUUIDUpdate:
       description: Assigning a UUID to a table/view should only be done when creating the table/view. It is not safe to re-assign the UUID if a table/view already has a UUID assigned
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - uuid
@@ -2233,8 +2229,6 @@ components:
           type: string
 
     UpgradeFormatVersionUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - format-version
@@ -2246,8 +2240,6 @@ components:
           type: integer
 
     AddSchemaUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - schema
@@ -2262,8 +2254,6 @@ components:
           description: The highest assigned column ID for the table. This is used to ensure columns are always assigned an unused ID when evolving schemas. When omitted, it will be computed on the server side.
 
     SetCurrentSchemaUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - schema-id
@@ -2276,8 +2266,6 @@ components:
           description: Schema ID to set as current, or -1 to set last added schema
 
     AddPartitionSpecUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - spec
@@ -2289,8 +2277,6 @@ components:
           $ref: '#/components/schemas/PartitionSpec'
 
     SetDefaultSpecUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - spec-id
@@ -2303,8 +2289,6 @@ components:
           description: Partition spec ID to set as the default, or -1 to set last added spec
 
     AddSortOrderUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - sort-order
@@ -2316,8 +2300,6 @@ components:
           $ref: '#/components/schemas/SortOrder'
 
     SetDefaultSortOrderUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - sort-order-id
@@ -2330,8 +2312,6 @@ components:
           description: Sort order ID to set as the default, or -1 to set last added sort order
 
     AddSnapshotUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - snapshot
@@ -2344,7 +2324,6 @@ components:
 
     SetSnapshotRefUpdate:
       allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
         - $ref: '#/components/schemas/SnapshotReference'
       required:
         - action
@@ -2357,8 +2336,6 @@ components:
           type: string
 
     RemoveSnapshotsUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - snapshot-ids
@@ -2373,8 +2350,6 @@ components:
             format: int64
 
     RemoveSnapshotRefUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - ref-name
@@ -2386,8 +2361,6 @@ components:
           type: string
 
     SetLocationUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - location
@@ -2399,8 +2372,6 @@ components:
           type: string
 
     SetPropertiesUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - updates
@@ -2414,8 +2385,6 @@ components:
             type: string
 
     RemovePropertiesUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - removals
@@ -2429,8 +2398,6 @@ components:
             type: string
 
     AddViewVersionUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - view-version
@@ -2442,8 +2409,6 @@ components:
           $ref: '#/components/schemas/ViewVersion'
 
     SetCurrentViewVersionUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - view-version-id
@@ -2456,8 +2421,6 @@ components:
           description: The view version id to set as current, or -1 to set last added view version id
 
     SetStatisticsUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - snapshot-id
@@ -2473,8 +2436,6 @@ components:
           $ref: '#/components/schemas/StatisticsFile'
 
     RemoveStatisticsUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - snapshot-id
@@ -2487,8 +2448,6 @@ components:
           format: int64
 
     SetPartitionStatisticsUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - partition-statistics
@@ -2500,8 +2459,6 @@ components:
           $ref: '#/components/schemas/PartitionStatisticsFile'
 
     RemovePartitionStatisticsUpdate:
-      allOf:
-        - $ref: '#/components/schemas/BaseUpdate'
       required:
         - action
         - snapshot-id
@@ -2558,8 +2515,6 @@ components:
         - $ref: '#/components/schemas/AssertDefaultSortOrderId'
 
     AssertCreate:
-      allOf:
-        - $ref: "#/components/schemas/BaseRequirement"
       type: object
       description: The table must not already exist; used for create transactions
       required:
@@ -2570,8 +2525,6 @@ components:
           enum: ["assert-create"]
 
     AssertTableUUID:
-      allOf:
-        - $ref: "#/components/schemas/BaseRequirement"
       description: The table UUID must match the requirement's `uuid`
       required:
         - type
@@ -2584,8 +2537,6 @@ components:
           type: string
 
     AssertRefSnapshotId:
-      allOf:
-        - $ref: "#/components/schemas/BaseRequirement"
       description:
         The table branch or tag identified by the requirement's `ref` must reference the requirement's `snapshot-id`; 
         if `snapshot-id` is `null` or missing, the ref must not already exist
@@ -2604,8 +2555,6 @@ components:
           format: int64
 
     AssertLastAssignedFieldId:
-      allOf:
-        - $ref: "#/components/schemas/BaseRequirement"
       description:
         The table's last assigned column id must match the requirement's `last-assigned-field-id`
       required:
@@ -2619,8 +2568,6 @@ components:
           type: integer
 
     AssertCurrentSchemaId:
-      allOf:
-        - $ref: "#/components/schemas/BaseRequirement"
       description:
         The table's current schema id must match the requirement's `current-schema-id`
       required:
@@ -2634,8 +2581,6 @@ components:
           type: integer
 
     AssertLastAssignedPartitionId:
-      allOf:
-        - $ref: "#/components/schemas/BaseRequirement"
       description:
         The table's last assigned partition id must match the requirement's `last-assigned-partition-id`
       required:
@@ -2649,8 +2594,6 @@ components:
           type: integer
 
     AssertDefaultSpecId:
-      allOf:
-        - $ref: "#/components/schemas/BaseRequirement"
       description:
         The table's default spec id must match the requirement's `default-spec-id`
       required:
@@ -2664,8 +2607,6 @@ components:
           type: integer
 
     AssertDefaultSortOrderId:
-      allOf:
-        - $ref: "#/components/schemas/BaseRequirement"
       description:
         The table's default sort order id must match the requirement's `default-sort-order-id`
       required:
@@ -2679,20 +2620,10 @@ components:
           type: integer
 
     ViewRequirement:
-      discriminator:
-        propertyName: type
-        mapping:
-          assert-view-uuid: '#/components/schemas/AssertViewUUID'
-      type: object
-      required:
-        - type
-      properties:
-        type:
-          type: "string"
+      anyOf:
+        - $ref: "#/components/schemas/AssertViewUUID"
 
     AssertViewUUID:
-      allOf:
-        - $ref: "#/components/schemas/ViewRequirement"
       description: The view UUID must match the requirement's `uuid`
       required:
         - type
