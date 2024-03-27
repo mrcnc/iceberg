@@ -43,7 +43,10 @@ public class TestCensusCatalog extends TestRESTCatalog {
             (config) -> HTTPClient.builder(config).uri(config.get(CatalogProperties.URI)).build());
     restCatalog.initialize(
             "census",
-            ImmutableMap.of(CatalogProperties.URI, censusUri));
+            ImmutableMap.of(
+                    CatalogProperties.URI, censusUri,
+                    CatalogProperties.FILE_IO_IMPL, "org.apache.iceberg.inmemory.InMemoryFileIO"
+            ));
   }
 
   @AfterEach
