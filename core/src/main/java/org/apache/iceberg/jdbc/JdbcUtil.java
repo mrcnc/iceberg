@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import javax.sql.DataSource;
 import org.apache.iceberg.BaseMetastoreTableOperations;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.TableIdentifier;
@@ -42,6 +43,8 @@ final class JdbcUtil {
   // property to control if catalog tables are created during initialization
   static final String INIT_CATALOG_TABLES_PROPERTY =
       JdbcCatalog.PROPERTY_PREFIX + "init-catalog-tables";
+  // property for the name of the DataSource class provided by the JDBC driver
+  static final String DATA_SOURCE_CLASS_PROPERTY = JdbcCatalog.PROPERTY_PREFIX + "datasource-class";
 
   static final String RETRYABLE_STATUS_CODES = "retryable_status_codes";
 
@@ -826,5 +829,23 @@ final class JdbcUtil {
       Thread.currentThread().interrupt();
       throw new UncheckedInterruptedException(e, "Interrupted in SQL query");
     }
+  }
+
+  static DataSource getDataSource(String dbUrl, Map<String, String> properties) {
+    // Use DataSource class if provided
+    if (properties.containsValue(DATA_SOURCE_CLASS_PROPERTY)) {
+      String dataSourceClassName = properties.get(DATA_SOURCE_CLASS_PROPERTY);
+      try {
+        Class<?> clazz = Class.forName(dataSourceClassName);
+        DataSource customDataSource = (DataSource) clazz.getDeclaredConstructor().newInstance();
+        return customDataSource;
+      } catch (Exception e) {
+        throw new RuntimeException(
+            "Failed to instantiate custom DataSource from class: " + dataSourceClassName, e);
+      }
+    }
+    // Default to using DriverManagerDataSource
+    Properties dbProps = JdbcUtil.filterAndRemovePrefix(properties, JdbcCatalog.PROPERTY_PREFIX);
+    return new DriverManagerDataSource(dbUrl, dbProps);
   }
 }
