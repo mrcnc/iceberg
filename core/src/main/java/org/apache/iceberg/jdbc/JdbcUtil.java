@@ -18,6 +18,7 @@
  */
 package org.apache.iceberg.jdbc;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -832,20 +833,22 @@ final class JdbcUtil {
   }
 
   static DataSource getDataSource(String dbUrl, Map<String, String> properties) {
-    // Use DataSource class if provided
-    if (properties.containsValue(DATA_SOURCE_CLASS_PROPERTY)) {
-      String dataSourceClassName = properties.get(DATA_SOURCE_CLASS_PROPERTY);
+    String dataSourceClassName = properties.get(DATA_SOURCE_CLASS_PROPERTY);
+    if (dataSourceClassName != null) {
+      Class<?> clazz;
       try {
-        Class<?> clazz = Class.forName(dataSourceClassName);
-        DataSource customDataSource = (DataSource) clazz.getDeclaredConstructor().newInstance();
-        return customDataSource;
+        clazz = Class.forName(dataSourceClassName);
+        if (!DataSource.class.isAssignableFrom(clazz)) {
+          throw new IllegalArgumentException("Specified class does not implement DataSource: " + dataSourceClassName);
+        }
+        return (DataSource) clazz.getDeclaredConstructor().newInstance();
       } catch (Exception e) {
-        throw new RuntimeException(
-            "Failed to instantiate custom DataSource from class: " + dataSourceClassName, e);
+        throw new RuntimeException("Failed to load DataSource class: " + dataSourceClassName, e);
       }
     }
     // Default to using DriverManagerDataSource
     Properties dbProps = JdbcUtil.filterAndRemovePrefix(properties, JdbcCatalog.PROPERTY_PREFIX);
     return new DriverManagerDataSource(dbUrl, dbProps);
   }
+
 }

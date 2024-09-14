@@ -26,6 +26,9 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
+import org.apache.iceberg.relocated.com.google.common.base.Preconditions;
+import org.apache.iceberg.relocated.com.google.common.base.Strings;
+
 
 // A DataSource implementation that uses DriverManager
 public class DriverManagerDataSource implements DataSource {
@@ -51,9 +54,7 @@ public class DriverManagerDataSource implements DataSource {
 
   @Override
   public Connection getConnection() throws SQLException {
-    if (jdbcUrl == null || jdbcUrl.isEmpty()) {
-      throw new IllegalArgumentException("JDBC URL must not be null or empty.");
-    }
+    Preconditions.checkArgument(!Strings.isNullOrEmpty(jdbcUrl), "JDBC URL must not be null or empty.");
     return DriverManager.getConnection(jdbcUrl, properties);
   }
 
