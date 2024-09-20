@@ -19,14 +19,13 @@
 package org.apache.iceberg.jdbc;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLTransientException;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
 import org.apache.iceberg.CatalogProperties;
 import org.apache.iceberg.ClientPoolImpl;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableSet;
@@ -52,6 +51,7 @@ public class JdbcClientPool extends ClientPoolImpl<Connection, SQLException> {
 
   private final String dbUrl;
   private final Map<String, String> properties;
+  private final DataSource dataSource;
 
   private final Set<String> retryableStatusCodes;
 
@@ -79,13 +79,13 @@ public class JdbcClientPool extends ClientPoolImpl<Connection, SQLException> {
     }
 
     this.dbUrl = dbUrl;
+    this.dataSource = JdbcUtil.getDataSource(this.dbUrl, properties);
   }
 
   @Override
   protected Connection newClient() {
     try {
-      Properties dbProps = JdbcUtil.filterAndRemovePrefix(properties, JdbcCatalog.PROPERTY_PREFIX);
-      return DriverManager.getConnection(dbUrl, dbProps);
+      return dataSource.getConnection();
     } catch (SQLException e) {
       throw new UncheckedSQLException(e, "Failed to connect: %s", dbUrl);
     }
