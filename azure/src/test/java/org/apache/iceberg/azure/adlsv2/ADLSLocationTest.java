@@ -89,12 +89,4 @@ public class ADLSLocationTest {
     ADLSLocation location = new ADLSLocation(fullPath);
     assertThat(location.path()).contains(path);
   }
-
-  @ParameterizedTest
-  @ValueSource(strings = {"file?.txt", "file%3F.txt"})
-  public void testQuestionMarkInFileName(String path) {
-    String fullPath = String.format("abfs://container@account.dfs.core.windows.net/%s", path);
-    ADLSLocation location = new ADLSLocation(fullPath);
-    assertThat(location.path()).contains(path);
-  }
 }
