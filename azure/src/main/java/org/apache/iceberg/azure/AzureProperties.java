@@ -81,15 +81,13 @@ public class AzureProperties implements Serializable {
    * Applies configuration to the {@link DataLakeFileSystemClientBuilder} to provide the endpoint
    * and credentials required to create an instance of the client.
    *
-   * <p>The default endpoint is constructed in the form {@code
-   * https://{account}.dfs.core.windows.net} and default credentials are provided via the {@link
-   * com.azure.identity.DefaultAzureCredential}.
+   * <p>Default credentials are provided via the {@link com.azure.identity.DefaultAzureCredential}.
    *
-   * @param account the service account name
+   * @param host the storage account host (e.g. account1.dfs.core.windows.net)
    * @param builder the builder instance
    */
-  public void applyClientConfiguration(String account, DataLakeFileSystemClientBuilder builder) {
-    String sasToken = adlsSasTokens.get(account);
+  public void applyClientConfiguration(String host, DataLakeFileSystemClientBuilder builder) {
+    String sasToken = adlsSasTokens.get(host);
     if (sasToken != null && !sasToken.isEmpty()) {
       builder.sasToken(sasToken);
     } else if (namedKeyCreds != null) {
@@ -100,11 +98,11 @@ public class AzureProperties implements Serializable {
     }
 
     // apply connection string last so its parameters take precedence, e.g. SAS token
-    String connectionString = adlsConnectionStrings.get(account);
+    String connectionString = adlsConnectionStrings.get(host);
     if (connectionString != null && !connectionString.isEmpty()) {
       builder.endpoint(connectionString);
     } else {
-      builder.endpoint("https://" + account + ".dfs.core.windows.net");
+      builder.endpoint("https://" + host);
     }
   }
 }
