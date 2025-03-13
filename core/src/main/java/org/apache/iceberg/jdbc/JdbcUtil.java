@@ -18,6 +18,7 @@
  */
 package org.apache.iceberg.jdbc;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,6 +26,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import javax.sql.DataSource;
 import org.apache.iceberg.BaseMetastoreTableOperations;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.TableIdentifier;
@@ -42,6 +44,8 @@ final class JdbcUtil {
   // property to control if catalog tables are created during initialization
   static final String INIT_CATALOG_TABLES_PROPERTY =
       JdbcCatalog.PROPERTY_PREFIX + "init-catalog-tables";
+  // property for the name of the DataSource class provided by the JDBC driver
+  static final String DATA_SOURCE_CLASS_PROPERTY = JdbcCatalog.PROPERTY_PREFIX + "datasource-class";
 
   static final String RETRYABLE_STATUS_CODES = "retryable_status_codes";
 
@@ -831,4 +835,24 @@ final class JdbcUtil {
       throw new UncheckedInterruptedException(e, "Interrupted in SQL query");
     }
   }
+
+  static DataSource getDataSource(String dbUrl, Map<String, String> properties) {
+    String dataSourceClassName = properties.get(DATA_SOURCE_CLASS_PROPERTY);
+    if (dataSourceClassName != null) {
+      Class<?> clazz;
+      try {
+        clazz = Class.forName(dataSourceClassName);
+        if (!DataSource.class.isAssignableFrom(clazz)) {
+          throw new IllegalArgumentException("Specified class does not implement DataSource: " + dataSourceClassName);
+        }
+        return (DataSource) clazz.getDeclaredConstructor().newInstance();
+      } catch (Exception e) {
+        throw new RuntimeException("Failed to load DataSource class: " + dataSourceClassName, e);
+      }
+    }
+    // Default to using DriverManagerDataSource
+    Properties dbProps = JdbcUtil.filterAndRemovePrefix(properties, JdbcCatalog.PROPERTY_PREFIX);
+    return new DriverManagerDataSource(dbUrl, dbProps);
+  }
+
 }
