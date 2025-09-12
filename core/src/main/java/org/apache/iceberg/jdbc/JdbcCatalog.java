@@ -39,6 +39,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.sql.DataSource;
 import org.apache.iceberg.CatalogProperties;
 import org.apache.iceberg.CatalogUtil;
 import org.apache.iceberg.Schema;
@@ -110,8 +111,12 @@ public class JdbcCatalog extends BaseMetastoreViewCatalog
   @Override
   public void initialize(String name, Map<String, String> properties) {
     Preconditions.checkNotNull(properties, "Invalid catalog properties: null");
+    // Either a URI or valid DataSource class name must be given
     String uri = properties.get(CatalogProperties.URI);
-    Preconditions.checkNotNull(uri, "JDBC connection URI is required");
+    String dataSourceClassName = properties.get(JdbcUtil.DATA_SOURCE_CLASS_PROPERTY);
+    if (dataSourceClassName == null) {
+      Preconditions.checkNotNull(uri, "JDBC connection URI is required");
+    }
 
     String inputWarehouseLocation = properties.get(CatalogProperties.WAREHOUSE_LOCATION);
     Preconditions.checkArgument(
@@ -134,10 +139,10 @@ public class JdbcCatalog extends BaseMetastoreViewCatalog
       this.io = CatalogUtil.loadFileIO(ioImpl, properties, conf);
     }
 
-    LOG.debug("Connecting to JDBC database {}", uri);
     if (null != clientPoolBuilder) {
       this.connections = clientPoolBuilder.apply(properties);
     } else {
+      LOG.debug("Connecting to JDBC database {}", uri);
       this.connections = new JdbcClientPool(uri, properties);
     }
 

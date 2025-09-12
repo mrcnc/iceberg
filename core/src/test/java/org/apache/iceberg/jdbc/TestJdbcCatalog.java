@@ -179,6 +179,15 @@ public class TestJdbcCatalog extends CatalogTests<JdbcCatalog> {
   }
 
   @Test
+  public void testInitializeCustomDataSourceClass() {
+    Map<String, String> properties = Maps.newHashMap();
+    properties.put(JdbcUtil.DATA_SOURCE_CLASS_PROPERTY, "org.sqlite.SQLiteDataSource");
+    JdbcCatalog jdbcCatalog = new JdbcCatalog();
+    jdbcCatalog.setConf(conf);
+    jdbcCatalog.initialize("test_jdbc_catalog", properties);
+  }
+
+  @Test
   public void testDisableInitCatalogTablesOverridesDefault() throws Exception {
     // as this test uses different connections, we can't use memory database (as it's per
     // connection), but a file database instead
